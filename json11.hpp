@@ -12,6 +12,19 @@
  *
  * Internally, the various types of Json object are represented by the JsonValue class
  * hierarchy.
+ *
+ * A note on numbers - JSON specifies the syntax of number formatting but not its semantics,
+ * so some JSON implementations distinguish between integers and floating-point numbers, while
+ * some don't. In json11, we choose the latter. Because some JSON implementations (namely
+ * Javascript itself) treat all numbers as the same type, distinguishing the two leads
+ * to JSON that will be *silently* changed by a round-trip through those implementations.
+ * Dangerous! To avoid that risk, json11 stores all numbers as double internally, but also
+ * provides integer helpers.
+ *
+ * Fortunately, double-precision IEEE754 ('double') can precisely store any integer in the
+ * range +/-2^53, which includes every 'int' on most systems. (Timestamps often use int64
+ * or long long to avoid the Y2038K problem; a double storing microseconds since some epoch
+ * will be exact for +/- 275 years.)
  */
 
 /* Copyright (c) 2013 Dropbox, Inc.
@@ -118,7 +131,7 @@ public:
     // Return the enclosed std::map if this is an object, or an empty map otherwise.
     const object &object_items() const;
 
-    // Return a reference to arr[i] if this is an object, Json() otherwise.
+    // Return a reference to arr[i] if this is an array, Json() otherwise.
     const Json & operator[](size_t i) const;
     // Return a reference to obj[key] if this is an object, Json() otherwise.
     const Json & operator[](const std::string &key) const;

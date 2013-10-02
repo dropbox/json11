@@ -300,7 +300,7 @@ static inline string esc(char c) {
     return string(buf);
 }
 
-static inline bool in_range (int x, int lower, int upper) {
+static inline bool in_range(long x, long lower, long upper) {
     return (x >= lower && x <= upper);
 }
 

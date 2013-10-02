@@ -4,6 +4,9 @@
 #include <sstream>
 #include "json11.hpp"
 #include <cassert>
+#include <list>
+#include <set>
+#include <unordered_map>
 
 using namespace json11;
 using std::string;
@@ -50,6 +53,16 @@ int main(int argc, char **argv) {
     for (auto &k : json["k3"].array_items()) {
         std::cout << "    - " << k.dump() << "\n";
     }
+
+    std::list<int> l1 { 1, 2, 3 };
+    std::vector<int> l2 { 1, 2, 3 };
+    std::set<int> l3 { 1, 2, 3 };
+    assert(Json(l1) == Json(l2));
+    assert(Json(l2) == Json(l3));
+
+    std::map<string, string> m1 { { "k1", "v1" }, { "k2", "v2" } };
+    std::unordered_map<string, string> m2 { { "k1", "v1" }, { "k2", "v2" } };
+    assert(Json(m1) == Json(m2));
 
     // Json literals
     Json obj = Json::object({
