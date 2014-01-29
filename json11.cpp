@@ -207,18 +207,37 @@ public:
 };
 
 /* * * * * * * * * * * * * * * * * * * *
+ * Static globals - static-init-safe
+ */
+struct Statics {
+    const std::shared_ptr<JsonValue> null = make_shared<JsonNull>();
+    const std::shared_ptr<JsonValue> t = make_shared<JsonBoolean>(true);
+    const std::shared_ptr<JsonValue> f = make_shared<JsonBoolean>(false);
+    const string empty_string;
+    const vector<Json> empty_vector;
+    const map<string, Json> empty_map;
+};
+
+const Statics & statics() {
+    static const Statics s {};
+    return s;
+}
+
+const Json & static_null() {
+    // This has to be separate, not in Statics, because Json() accesses statics().null.
+    static const Json json_null;
+    return json_null;
+}
+
+/* * * * * * * * * * * * * * * * * * * *
  * Constructors
  */
 
-static const std::shared_ptr<JsonValue> obj_null(make_shared<JsonNull>());
-static const std::shared_ptr<JsonValue> obj_true(make_shared<JsonBoolean>(true));
-static const std::shared_ptr<JsonValue> obj_false(make_shared<JsonBoolean>(false));
-
-Json::Json() noexcept                  : m_ptr(obj_null) {}
-Json::Json(std::nullptr_t) noexcept    : m_ptr(obj_null) {}
+Json::Json() noexcept                  : m_ptr(statics().null) {}
+Json::Json(std::nullptr_t) noexcept    : m_ptr(statics().null) {}
 Json::Json(double value)               : m_ptr(make_shared<JsonDouble>(value)) {}
 Json::Json(int value)                  : m_ptr(make_shared<JsonInt>(value)) {}
-Json::Json(bool value)                 : m_ptr(value ? obj_true : obj_false) {}
+Json::Json(bool value)                 : m_ptr(value ? statics().t : statics().f) {}
 Json::Json(const string &value)        : m_ptr(make_shared<JsonString>(value)) {}
 Json::Json(string &&value)             : m_ptr(make_shared<JsonString>(move(value))) {}
 Json::Json(const char * value)         : m_ptr(make_shared<JsonString>(value)) {}
@@ -230,11 +249,6 @@ Json::Json(Json::object &&values)      : m_ptr(make_shared<JsonObject>(move(valu
 /* * * * * * * * * * * * * * * * * * * *
  * Accessors
  */
-
-static const string empty_string;
-static const vector<Json> empty_vector;
-static const map<string, Json> empty_map;
-static const Json json_null;
 
 Json::Type Json::type()                           const { return m_ptr->type();         }
 double Json::number_value()                       const { return m_ptr->number_value(); }
@@ -249,18 +263,18 @@ const Json & Json::operator[] (const string &key) const { return (*m_ptr)[key]; 
 double                    JsonValue::number_value()              const { return 0; }
 int                       JsonValue::int_value()                 const { return 0; }
 bool                      JsonValue::bool_value()                const { return false; }
-const string &            JsonValue::string_value()              const { return empty_string; }
-const vector<Json> &      JsonValue::array_items()               const { return empty_vector; }
-const map<string, Json> & JsonValue::object_items()              const { return empty_map; }
-const Json &              JsonValue::operator[] (size_t)         const { return json_null; }
-const Json &              JsonValue::operator[] (const string &) const { return json_null; }
+const string &            JsonValue::string_value()              const { return statics().empty_string; }
+const vector<Json> &      JsonValue::array_items()               const { return statics().empty_vector; }
+const map<string, Json> & JsonValue::object_items()              const { return statics().empty_map; }
+const Json &              JsonValue::operator[] (size_t)         const { return static_null(); }
+const Json &              JsonValue::operator[] (const string &) const { return static_null(); }
 
 const Json & JsonObject::operator[] (const string &key) const {
     auto iter = m_value.find(key);
-    return (iter == m_value.end()) ? json_null : iter->second;
+    return (iter == m_value.end()) ? static_null() : iter->second;
 }
 const Json & JsonArray::operator[] (size_t i) const {
-    if (i >= m_value.size()) return json_null;
+    if (i >= m_value.size()) return static_null();
     else return m_value[i];
 }
 
