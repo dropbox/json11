@@ -159,10 +159,10 @@ public:
 
     bool operator== (const Json &rhs) const;
     bool operator<  (const Json &rhs) const;
-    bool operator!= (const Json &rhs) { return !(*this == rhs); }
-    bool operator<= (const Json &rhs) { return !(rhs < *this); }
-    bool operator>  (const Json &rhs) { return  (rhs < *this); }
-    bool operator>= (const Json &rhs) { return !(*this < rhs); }
+    bool operator!= (const Json &rhs) const { return !(*this == rhs); }
+    bool operator<= (const Json &rhs) const { return !(rhs < *this); }
+    bool operator>  (const Json &rhs) const { return  (rhs < *this); }
+    bool operator>= (const Json &rhs) const { return !(*this < rhs); }
 
     /* has_shape(types, err)
      *
