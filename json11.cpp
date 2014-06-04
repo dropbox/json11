@@ -27,6 +27,8 @@
 
 namespace json11 {
 
+static const int max_depth = 200;
+
 using std::string;
 using std::vector;
 using std::map;
@@ -557,7 +559,11 @@ struct JsonParser {
      *
      * Parse a JSON object.
      */
-    Json parse_json() {
+    Json parse_json(int depth) {
+        if (depth > max_depth) {
+            return fail("exceeded maximum nesting depth");
+        }
+
         char ch = get_next_token();
         if (failed)
             return Json();
@@ -597,7 +603,7 @@ struct JsonParser {
                 if (ch != ':')
                     return fail("expected ':' in object, got " + esc(ch));
 
-                data[std::move(key)] = parse_json();
+                data[std::move(key)] = parse_json(depth + 1);
                 if (failed)
                     return Json();
 
@@ -620,7 +626,7 @@ struct JsonParser {
 
             while (1) {
                 i--;
-                data.push_back(parse_json());
+                data.push_back(parse_json(depth + 1));
                 if (failed)
                     return Json();
 
@@ -642,7 +648,7 @@ struct JsonParser {
 
 Json Json::parse(const string &in, string &err) {
     JsonParser parser { in, 0, err, false };
-    Json result = parser.parse_json();
+    Json result = parser.parse_json(0);
 
     // Check for any trailing garbage
     parser.consume_whitespace();
@@ -658,7 +664,7 @@ vector<Json> Json::parse_multi(const string &in, string &err) {
 
     vector<Json> json_vec;
     while (parser.i != in.size() && !parser.failed) {
-        json_vec.push_back(parser.parse_json());
+        json_vec.push_back(parser.parse_json(0));
         // Check for another object
         parser.consume_whitespace();
     }
