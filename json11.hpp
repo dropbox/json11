@@ -91,14 +91,14 @@ public:
 
     // Implicit constructor: map-like objects (std::map, std::unordered_map, etc)
     template <class M, typename std::enable_if<
-        std::is_constructible<std::string, decltype(std::declval<M>().begin()->first)>::value
-        && std::is_constructible<Json, decltype(std::declval<M>().begin()->second)>::value,
+        std::is_constructible<std::string, typename M::key_type>::value
+        && std::is_constructible<Json, typename M::mapped_type>::value,
             int>::type = 0>
     Json(const M & m) : Json(object(m.begin(), m.end())) {}
 
     // Implicit constructor: vector-like objects (std::list, std::vector, std::set, etc)
     template <class V, typename std::enable_if<
-        std::is_constructible<Json, decltype(*std::declval<V>().begin())>::value,
+        std::is_constructible<Json, typename V::value_type>::value,
             int>::type = 0>
     Json(const V & v) : Json(array(v.begin(), v.end())) {}
 
