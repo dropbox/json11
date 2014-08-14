@@ -218,6 +218,7 @@ struct Statics {
     const string empty_string;
     const vector<Json> empty_vector;
     const map<string, Json> empty_map;
+    Statics() {}
 };
 
 const Statics & statics() {
