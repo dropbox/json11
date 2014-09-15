@@ -78,16 +78,16 @@ static void dump(const string &value, string &out) {
             out += "\\r";
         } else if (ch == '\t') {
             out += "\\t";
-        } else if ((uint8_t)ch <= 0x1f) {
+        } else if (static_cast<uint8_t>(ch) <= 0x1f) {
             char buf[8];
             snprintf(buf, sizeof buf, "\\u%04x", ch);
             out += buf;
-        } else if ((uint8_t)ch == 0xe2 && (uint8_t)value[i+1] == 0x80
-                   && (uint8_t)value[i+2] == 0xa8) {
+        } else if (static_cast<uint8_t>(ch) == 0xe2 && static_cast<uint8_t>(value[i+1]) == 0x80
+                   && static_cast<uint8_t>(value[i+2]) == 0xa8) {
             out += "\\u2028";
             i += 2;
-        } else if ((uint8_t)ch == 0xe2 && (uint8_t)value[i+1] == 0x80
-                   && (uint8_t)value[i+2] == 0xa9) {
+        } else if (static_cast<uint8_t>(ch) == 0xe2 && static_cast<uint8_t>(value[i+1]) == 0x80
+                   && static_cast<uint8_t>(value[i+2]) == 0xa9) {
             out += "\\u2029";
             i += 2;
         } else {
@@ -136,71 +136,71 @@ class Value : public JsonValue {
 protected:
 
     // Constructors
-    Value(const T &value) : m_value(value) {}
-    Value(T &&value)      : m_value(move(value)) {}
+    explicit Value(const T &value) : m_value(value) {}
+    explicit Value(T &&value)      : m_value(move(value)) {}
 
     // Get type tag
-    Json::Type type() const {
+    Json::Type type() const override {
         return tag;
     }
 
     // Comparisons
-    bool equals(const JsonValue * other) const {
+    bool equals(const JsonValue * other) const override {
         return m_value == reinterpret_cast<const Value<tag, T> *>(other)->m_value;
     }
-    bool less(const JsonValue * other) const {
+    bool less(const JsonValue * other) const override {
         return m_value < reinterpret_cast<const Value<tag, T> *>(other)->m_value;
     }
 
     const T m_value;
-    void dump(string &out) const { json11::dump(m_value, out); }
+    void dump(string &out) const override { json11::dump(m_value, out); }
 };
 
 class JsonDouble final : public Value<Json::NUMBER, double> {
-    double number_value() const { return m_value; }
-    int int_value() const { return m_value; }
-    bool equals(const JsonValue * other) const { return m_value == other->number_value(); }
-    bool less(const JsonValue * other)   const { return m_value <  other->number_value(); }
+    double number_value() const override { return m_value; }
+    int int_value() const override { return m_value; }
+    bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
+    bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
 public:
-    JsonDouble(double value) : Value(value) {}
+    explicit JsonDouble(double value) : Value(value) {}
 };
 
 class JsonInt final : public Value<Json::NUMBER, int> {
-    double number_value() const { return m_value; }
-    int int_value() const { return m_value; }
-    bool equals(const JsonValue * other) const { return m_value == other->number_value(); }
-    bool less(const JsonValue * other)   const { return m_value <  other->number_value(); }
+    double number_value() const override { return m_value; }
+    int int_value() const override { return m_value; }
+    bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
+    bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
 public:
-    JsonInt(double value) : Value(value) {}
+    explicit JsonInt(double value) : Value(value) {}
 };
 
 class JsonBoolean final : public Value<Json::BOOL, bool> {
-    bool bool_value() const { return m_value; }
+    bool bool_value() const override { return m_value; }
 public:
-    JsonBoolean(bool value) : Value(value) {}
+    explicit JsonBoolean(bool value) : Value(value) {}
 };
 
 class JsonString final : public Value<Json::STRING, string> {
-    const string &string_value() const { return m_value; }
+    const string &string_value() const override { return m_value; }
 public:
-    JsonString(const string &value) : Value(value) {}
-    JsonString(string &&value)      : Value(move(value)) {}
+    explicit JsonString(const string &value) : Value(value) {}
+    explicit JsonString(string &&value)      : Value(move(value)) {}
 };
 
 class JsonArray final : public Value<Json::ARRAY, Json::array> {
-    const Json::array &array_items() const { return m_value; }
-    const Json & operator[](size_t i) const;
+    const Json::array &array_items() const override { return m_value; }
+    const Json & operator[](size_t i) const override;
 public:
-    JsonArray(const Json::array &value) : Value(value) {}
-    JsonArray(Json::array &&value)      : Value(move(value)) {}
+    explicit JsonArray(const Json::array &value) : Value(value) {}
+    explicit JsonArray(Json::array &&value)      : Value(move(value)) {}
 };
 
 class JsonObject final : public Value<Json::OBJECT, Json::object> {
-    const Json::object &object_items() const { return m_value; }
-    const Json & operator[](const string &key) const;
+    const Json::object &object_items() const override { return m_value; }
+    const Json & operator[](const string &key) const override;
 public:
-    JsonObject(const Json::object &value) : Value(value) {}
-    JsonObject(Json::object &&value)      : Value(move(value)) {}
+    explicit JsonObject(const Json::object &value) : Value(value) {}
+    explicit JsonObject(Json::object &&value)      : Value(move(value)) {}
 };
 
 class JsonNull final : public Value<Json::NUL, std::nullptr_t> {
@@ -309,7 +309,7 @@ bool Json::operator< (const Json &other) const {
  */
 static inline string esc(char c) {
     char buf[12];
-    if ((uint8_t)c >= 0x20 && (uint8_t)c <= 0x7f) {
+    if (static_cast<uint8_t>(c) >= 0x20 && static_cast<uint8_t>(c) <= 0x7f) {
         snprintf(buf, sizeof buf, "'%c' (%d)", c, c);
     } else {
         snprintf(buf, sizeof buf, "(%d)", c);
@@ -508,7 +508,7 @@ struct JsonParser {
         }
 
         if (str[i] != '.' && str[i] != 'e' && str[i] != 'E'
-                && (i - start_pos) <= (size_t)std::numeric_limits<int>::digits10) {
+                && (i - start_pos) <= static_cast<size_t>(std::numeric_limits<int>::digits10)) {
             return std::atoi(str.c_str() + start_pos);
         }
 
