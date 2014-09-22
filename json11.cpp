@@ -158,7 +158,7 @@ protected:
 
 class JsonDouble final : public Value<Json::NUMBER, double> {
     double number_value() const override { return m_value; }
-    int int_value() const override { return m_value; }
+    int int_value() const override { return static_cast<int>(m_value); }
     bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
     bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
 public:
@@ -171,7 +171,7 @@ class JsonInt final : public Value<Json::NUMBER, int> {
     bool equals(const JsonValue * other) const override { return m_value == other->number_value(); }
     bool less(const JsonValue * other)   const override { return m_value <  other->number_value(); }
 public:
-    explicit JsonInt(double value) : Value(value) {}
+    explicit JsonInt(int value) : Value(value) {}
 };
 
 class JsonBoolean final : public Value<Json::BOOL, bool> {
