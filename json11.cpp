@@ -146,10 +146,10 @@ protected:
 
     // Comparisons
     bool equals(const JsonValue * other) const override {
-        return m_value == reinterpret_cast<const Value<tag, T> *>(other)->m_value;
+        return m_value == static_cast<const Value<tag, T> *>(other)->m_value;
     }
     bool less(const JsonValue * other) const override {
-        return m_value < reinterpret_cast<const Value<tag, T> *>(other)->m_value;
+        return m_value < static_cast<const Value<tag, T> *>(other)->m_value;
     }
 
     const T m_value;
