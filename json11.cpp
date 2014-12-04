@@ -547,12 +547,11 @@ struct JsonParser {
     Json expect(const string &expected, Json res) {
         assert(i != 0);
         i--;
-        const string found = str.substr(i, expected.length());
-        if (expected == found) {
+        if (str.compare(i, expected.length(), expected) == 0) {
             i += expected.length();
             return res;
         } else {
-            return fail("parse error: expected " + expected + ", got " + found);
+            return fail("parse error: expected " + expected + ", got " + str.substr(i, expected.length()));
         }
     }
 
