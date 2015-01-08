@@ -100,7 +100,7 @@ static void dump(const string &value, string &out) {
 static void dump(const Json::array &values, string &out) {
     bool first = true;
     out += "[";
-    for (auto &value : values) {
+    for (const auto &value : values) {
         if (!first)
             out += ", ";
         value.dump(out);
@@ -112,7 +112,7 @@ static void dump(const Json::array &values, string &out) {
 static void dump(const Json::object &values, string &out) {
     bool first = true;
     out += "{";
-    for (const std::pair<string, Json> &kv : values) {
+    for (const auto &kv : values) {
         if (!first)
             out += ", ";
         dump(kv.first, out);
