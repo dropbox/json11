@@ -381,19 +381,19 @@ struct JsonParser {
             return;
 
         if (pt < 0x80) {
-            out += pt;
+            out += static_cast<char>(pt);
         } else if (pt < 0x800) {
-            out += (pt >> 6) | 0xC0;
-            out += (pt & 0x3F) | 0x80;
+            out += static_cast<char>((pt >> 6) | 0xC0);
+            out += static_cast<char>((pt & 0x3F) | 0x80);
         } else if (pt < 0x10000) {
-            out += (pt >> 12) | 0xE0;
-            out += ((pt >> 6) & 0x3F) | 0x80;
-            out += (pt & 0x3F) | 0x80;
+            out += static_cast<char>((pt >> 12) | 0xE0);
+            out += static_cast<char>(((pt >> 6) & 0x3F) | 0x80);
+            out += static_cast<char>((pt & 0x3F) | 0x80);
         } else {
-            out += (pt >> 18) | 0xF0;
-            out += ((pt >> 12) & 0x3F) | 0x80;
-            out += ((pt >> 6) & 0x3F) | 0x80;
-            out += (pt & 0x3F) | 0x80;
+            out += static_cast<char>((pt >> 18) | 0xF0);
+            out += static_cast<char>(((pt >> 12) & 0x3F) | 0x80);
+            out += static_cast<char>(((pt >> 6) & 0x3F) | 0x80);
+            out += static_cast<char>((pt & 0x3F) | 0x80);
         }
     }
 
