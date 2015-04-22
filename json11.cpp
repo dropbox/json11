@@ -435,6 +435,12 @@ struct JsonParser {
             if (ch == 'u') {
                 // Extract 4-byte escape sequence
                 string esc = str.substr(i, 4);
+                // Explicitly check length of the substring. The following loop
+                // relies on std::string returning the terminating NUL when
+                // accessing str[length]. Checking here reduces brittleness.
+                if (esc.length() < 4) {
+                    return fail("bad \\u escape: " + esc, "");
+                }
                 for (int j = 0; j < 4; j++) {
                     if (!in_range(esc[j], 'a', 'f') && !in_range(esc[j], 'A', 'F')
                             && !in_range(esc[j], '0', '9'))
