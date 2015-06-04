@@ -21,6 +21,7 @@
 
 #include "json11.hpp"
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <cstdio>
 #include <limits>
@@ -45,9 +46,13 @@ static void dump(std::nullptr_t, string &out) {
 }
 
 static void dump(double value, string &out) {
-    char buf[32];
-    snprintf(buf, sizeof buf, "%.17g", value);
-    out += buf;
+    if (std::isfinite(value)) {
+        char buf[32];
+        snprintf(buf, sizeof buf, "%.17g", value);
+        out += buf;
+    } else {
+        out += "null";
+    }
 }
 
 static void dump(int value, string &out) {
