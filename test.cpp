@@ -1,5 +1,6 @@
 #include <string>
 #include <cstdio>
+#include <cstring>
 #include <iostream>
 #include <sstream>
 #include "json11.hpp"
@@ -89,7 +90,7 @@ int main(int argc, char **argv) {
 
     Json uni = Json::parse(unicode_escape_test, err);
     assert(uni[0].string_value().size() == (sizeof utf8) - 1);
-    assert(memcmp(uni[0].string_value().data(), utf8, sizeof utf8) == 0);
+    assert(std::memcmp(uni[0].string_value().data(), utf8, sizeof utf8) == 0);
 
     // Demonstrates the behavior change in Xcode 7 / Clang 3.7 described
     // here: https://llvm.org/bugs/show_bug.cgi?id=23812
