@@ -364,6 +364,33 @@ struct JsonParser {
             i++;
     }
 
+    /* consume_comment()
+     *
+     * Advance comments (c-style inline and multiline).
+     */
+    void consume_comment() {
+      if (str[i] == '/') {
+        i++;
+        if (str[i] == '/') { // inline comment
+          i++;
+          // advance until next line
+          while (str[i] != '\n')
+            i++;
+          consume_whitespace();
+          consume_comment();
+        }
+        else if (str[i] == '*') { // multiline comment
+          i++;
+           // advance until closing tokens
+          while (!(str[i] == '*' && str[i+1] == '/'))
+            i++;
+          i += 2;
+          consume_whitespace();
+          consume_comment();
+        }
+      }
+    }
+
     /* get_next_token()
      *
      * Return the next non-whitespace character. If the end of the input is reached,
