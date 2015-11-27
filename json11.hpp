@@ -56,6 +56,8 @@
 #include <memory>
 #include <initializer_list>
 
+#define JSON11_COMMENTS 1
+
 namespace json11 {
 
 class JsonValue;

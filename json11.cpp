@@ -391,13 +391,25 @@ struct JsonParser {
       }
     }
 
+    /* consume_garbage()
+     *
+     * Advance until the current character is non-whitespace and non-comment.
+     */
+    void consume_garbage() {
+      consume_whitespace();
+#ifdef JSON11_COMMENTS
+      consume_comment();
+      consume_whitespace();
+#endif
+    }
+
     /* get_next_token()
      *
      * Return the next non-whitespace character. If the end of the input is reached,
      * flag an error and return 0.
      */
     char get_next_token() {
-        consume_whitespace();
+        consume_garbage();
         if (i == str.size())
             return fail("unexpected end of input", 0);
 
@@ -689,7 +701,7 @@ Json Json::parse(const string &in, string &err) {
     Json result = parser.parse_json(0);
 
     // Check for any trailing garbage
-    parser.consume_whitespace();
+    parser.consume_garbage();
     if (parser.i != in.size())
         return parser.fail("unexpected trailing " + esc(in[parser.i]));
 
@@ -704,7 +716,7 @@ vector<Json> Json::parse_multi(const string &in, string &err) {
     while (parser.i != in.size() && !parser.failed) {
         json_vec.push_back(parser.parse_json(0));
         // Check for another object
-        parser.consume_whitespace();
+        parser.consume_garbage();
     }
     return json_vec;
 }
