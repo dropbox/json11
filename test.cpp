@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     }
 
     const string comment_test = R"({
-      // comment
+      // comment /* with nested comment */
       "a": 1,
       // comment
       // continued
@@ -67,6 +67,7 @@ int main(int argc, char **argv) {
       /* multi
          line
          comment */
+      // and single-line comment
       "c": [1, 2, 3]
     })";
 
