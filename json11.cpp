@@ -369,7 +369,8 @@ struct JsonParser {
      *
      * Advance comments (c-style inline and multiline).
      */
-    void consume_comment() {
+    bool consume_comment() {
+      bool comment_found = false;
       if (str[i] == '/') {
         i++;
         if (str[i] == '/') { // inline comment
@@ -377,8 +378,7 @@ struct JsonParser {
           // advance until next line
           while (str[i] != '\n')
             i++;
-          consume_whitespace();
-          consume_comment();
+          comment_found = true;
         }
         else if (str[i] == '*') { // multiline comment
           i++;
@@ -386,10 +386,10 @@ struct JsonParser {
           while (!(str[i] == '*' && str[i+1] == '/'))
             i++;
           i += 2;
-          consume_whitespace();
-          consume_comment();
+          comment_found = true;
         }
       }
+      return comment_found;
     }
 
     /* consume_garbage()
@@ -399,8 +399,12 @@ struct JsonParser {
     void consume_garbage() {
       consume_whitespace();
       if(detect_comments) {
-        consume_comment();
-        consume_whitespace();
+        bool comment_found = false;
+        do {
+          comment_found = consume_comment();
+          consume_whitespace();
+        }
+        while(comment_found);
       }
     }
 
