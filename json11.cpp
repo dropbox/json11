@@ -383,11 +383,16 @@ struct JsonParser {
         else if (str[i] == '*') { // multiline comment
           i++;
            // advance until closing tokens
-          while (!(str[i] == '*' && str[i+1] == '/'))
-            i++;
+          while (!(str[i] == '*' && str[i+1] == '/')) {
+            if (i == str.size())
+              return fail(
+                "unexpected end of input inside multi-line comment", 0);
+            i++;}
           i += 2;
           comment_found = true;
         }
+        else
+          return fail("malformed comment", 0);
       }
       return comment_found;
     }
