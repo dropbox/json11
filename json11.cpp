@@ -338,6 +338,7 @@ struct JsonParser {
     size_t i;
     string &err;
     bool failed;
+    bool detect_comments;
 
     /* fail(msg, err_ret = Json())
      *
@@ -397,10 +398,10 @@ struct JsonParser {
      */
     void consume_garbage() {
       consume_whitespace();
-#ifdef JSON11_COMMENTS
-      consume_comment();
-      consume_whitespace();
-#endif
+      if(detect_comments) {
+        consume_comment();
+        consume_whitespace();
+      }
     }
 
     /* get_next_token()
@@ -696,8 +697,8 @@ struct JsonParser {
     }
 };
 
-Json Json::parse(const string &in, string &err) {
-    JsonParser parser { in, 0, err, false };
+Json Json::parse(const string &in, string &err, bool detect_comments) {
+    JsonParser parser { in, 0, err, false, detect_comments };
     Json result = parser.parse_json(0);
 
     // Check for any trailing garbage
@@ -709,8 +710,10 @@ Json Json::parse(const string &in, string &err) {
 }
 
 // Documented in json11.hpp
-vector<Json> Json::parse_multi(const string &in, string &err) {
-    JsonParser parser { in, 0, err, false };
+vector<Json> Json::parse_multi(const string &in,
+                               string &err,
+                               bool detect_comments) {
+    JsonParser parser { in, 0, err, false, detect_comments };
 
     vector<Json> json_vec;
     while (parser.i != in.size() && !parser.failed) {

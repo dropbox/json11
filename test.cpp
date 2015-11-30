@@ -58,7 +58,6 @@ int main(int argc, char **argv) {
         std::cout << "    - " << k.dump() << "\n";
     }
 
-#ifdef JSON11_COMMENTS
     const string comment_test = R"({
       // comment
       "a": 1,
@@ -72,13 +71,13 @@ int main(int argc, char **argv) {
     })";
 
     string err_comment;
-    auto json_comment = Json::parse(comment_test, err_comment);
+    auto json_comment = Json::parse(
+      comment_test, err_comment, /*detect_comments=*/ true);
     if (!err_comment.empty()) {
         printf("Failed: %s\n", err_comment.c_str());
     } else {
         printf("Result: %s\n", json_comment.dump().c_str());
     }
-#endif
 
     std::list<int> l1 { 1, 2, 3 };
     std::vector<int> l2 { 1, 2, 3 };
