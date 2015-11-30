@@ -80,6 +80,45 @@ int main(int argc, char **argv) {
         printf("Result: %s\n", json_comment.dump().c_str());
     }
 
+    string failing_comment_test = R"({
+      /* bad comment
+      "a": 1,
+    })";
+
+    string err_failing_comment;
+    auto json_failing_comment = Json::parse(
+      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+    if (!err_failing_comment.empty()) {
+        printf("Failed: %s\n", err_failing_comment.c_str());
+    } else {
+        printf("Result: %s\n", json_failing_comment.dump().c_str());
+    }
+
+    failing_comment_test = R"({
+      / / bad comment
+      "a": 1,
+    })";
+
+    json_failing_comment = Json::parse(
+      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+    if (!err_failing_comment.empty()) {
+        printf("Failed: %s\n", err_failing_comment.c_str());
+    } else {
+        printf("Result: %s\n", json_failing_comment.dump().c_str());
+    }
+
+    failing_comment_test = R"({
+          "a": 1,
+        }/)";
+
+    json_failing_comment = Json::parse(
+      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+    if (!err_failing_comment.empty()) {
+        printf("Failed: %s\n", err_failing_comment.c_str());
+    } else {
+        printf("Result: %s\n", json_failing_comment.dump().c_str());
+    }
+
     std::list<int> l1 { 1, 2, 3 };
     std::vector<int> l2 { 1, 2, 3 };
     std::set<int> l3 { 1, 2, 3 };
