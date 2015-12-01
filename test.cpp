@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
     }
 
     failing_comment_test = R"({
-          "a": 1,
+          "a": 1
         }/)";
 
     json_failing_comment = Json::parse(
