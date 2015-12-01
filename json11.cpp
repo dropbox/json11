@@ -373,22 +373,35 @@ struct JsonParser {
       bool comment_found = false;
       if (str[i] == '/') {
         i++;
+        if (i == str.size())
+          return fail("unexpected end of input inside comment", 0);
         if (str[i] == '/') { // inline comment
           i++;
+          if (i == str.size())
+            return fail("unexpected end of input inside inline comment", 0);
           // advance until next line
-          while (str[i] != '\n')
+          while (str[i] != '\n') {
             i++;
+            if (i == str.size())
+              return fail("unexpected end of input inside inline comment", 0);
+          }
           comment_found = true;
         }
         else if (str[i] == '*') { // multiline comment
           i++;
+          if (i == str.size())
+            return fail("unexpected end of input inside multi-line comment", 0);
            // advance until closing tokens
           while (!(str[i] == '*' && str[i+1] == '/')) {
+            i++;
             if (i == str.size())
               return fail(
                 "unexpected end of input inside multi-line comment", 0);
-            i++;}
+          }
           i += 2;
+          if (i == str.size())
+            return fail(
+              "unexpected end of input inside multi-line comment", 0);
           comment_found = true;
         }
         else
