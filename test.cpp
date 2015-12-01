@@ -95,9 +95,7 @@ int main(int argc, char **argv) {
     }
 
     failing_comment_test = R"({
-      / / bad comment
-      "a": 1,
-    })";
+      / / bad comment })";
 
     json_failing_comment = Json::parse(
       failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
