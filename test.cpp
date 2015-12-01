@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
     string err_comment;
     auto json_comment = Json::parse(
-      comment_test, err_comment, /*detect_comments=*/ true);
+      comment_test, err_comment, JsonParse::COMMENTS);
     if (!err_comment.empty()) {
         printf("Failed: %s\n", err_comment.c_str());
     } else {
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
 
     string err_failing_comment;
     auto json_failing_comment = Json::parse(
-      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+      failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
     if (!err_failing_comment.empty()) {
         printf("Failed: %s\n", err_failing_comment.c_str());
     } else {
@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
       / / bad comment })";
 
     json_failing_comment = Json::parse(
-      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+      failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
     if (!err_failing_comment.empty()) {
         printf("Failed: %s\n", err_failing_comment.c_str());
     } else {
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
     failing_comment_test = R"({// bad comment })";
 
     json_failing_comment = Json::parse(
-      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+      failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
     if (!err_failing_comment.empty()) {
         printf("Failed: %s\n", err_failing_comment.c_str());
     } else {
@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
         }/)";
 
     json_failing_comment = Json::parse(
-      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+      failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
     if (!err_failing_comment.empty()) {
         printf("Failed: %s\n", err_failing_comment.c_str());
     } else {
@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
                                   comment *})";
 
     json_failing_comment = Json::parse(
-      failing_comment_test, err_failing_comment, /*detect_comments=*/ true);
+      failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
     if (!err_failing_comment.empty()) {
         printf("Failed: %s\n", err_failing_comment.c_str());
     } else {
