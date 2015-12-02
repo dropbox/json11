@@ -338,7 +338,7 @@ struct JsonParser {
     size_t i;
     string &err;
     bool failed;
-    JsonParse strategy;
+    const JsonParse strategy;
 
     /* fail(msg, err_ret = Json())
      *
