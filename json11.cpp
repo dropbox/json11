@@ -389,12 +389,12 @@ struct JsonParser {
         }
         else if (str[i] == '*') { // multiline comment
           i++;
-          if (i == str.size())
+          if (i > str.size()-2)
             return fail("unexpected end of input inside multi-line comment", 0);
-           // advance until closing tokens
+          // advance until closing tokens
           while (!(str[i] == '*' && str[i+1] == '/')) {
             i++;
-            if (i == str.size())
+            if (i > str.size()-2)
               return fail(
                 "unexpected end of input inside multi-line comment", 0);
           }
