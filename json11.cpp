@@ -338,6 +338,7 @@ struct JsonParser {
     size_t i;
     string &err;
     bool failed;
+    const JsonParse strategy;
 
     /* fail(msg, err_ret = Json())
      *
@@ -364,13 +365,74 @@ struct JsonParser {
             i++;
     }
 
+    /* consume_comment()
+     *
+     * Advance comments (c-style inline and multiline).
+     */
+    bool consume_comment() {
+      bool comment_found = false;
+      if (str[i] == '/') {
+        i++;
+        if (i == str.size())
+          return fail("unexpected end of input inside comment", 0);
+        if (str[i] == '/') { // inline comment
+          i++;
+          if (i == str.size())
+            return fail("unexpected end of input inside inline comment", 0);
+          // advance until next line
+          while (str[i] != '\n') {
+            i++;
+            if (i == str.size())
+              return fail("unexpected end of input inside inline comment", 0);
+          }
+          comment_found = true;
+        }
+        else if (str[i] == '*') { // multiline comment
+          i++;
+          if (i > str.size()-2)
+            return fail("unexpected end of input inside multi-line comment", 0);
+          // advance until closing tokens
+          while (!(str[i] == '*' && str[i+1] == '/')) {
+            i++;
+            if (i > str.size()-2)
+              return fail(
+                "unexpected end of input inside multi-line comment", 0);
+          }
+          i += 2;
+          if (i == str.size())
+            return fail(
+              "unexpected end of input inside multi-line comment", 0);
+          comment_found = true;
+        }
+        else
+          return fail("malformed comment", 0);
+      }
+      return comment_found;
+    }
+
+    /* consume_garbage()
+     *
+     * Advance until the current character is non-whitespace and non-comment.
+     */
+    void consume_garbage() {
+      consume_whitespace();
+      if(strategy == JsonParse::COMMENTS) {
+        bool comment_found = false;
+        do {
+          comment_found = consume_comment();
+          consume_whitespace();
+        }
+        while(comment_found);
+      }
+    }
+
     /* get_next_token()
      *
      * Return the next non-whitespace character. If the end of the input is reached,
      * flag an error and return 0.
      */
     char get_next_token() {
-        consume_whitespace();
+        consume_garbage();
         if (i == str.size())
             return fail("unexpected end of input", 0);
 
@@ -657,12 +719,12 @@ struct JsonParser {
     }
 };
 
-Json Json::parse(const string &in, string &err) {
-    JsonParser parser { in, 0, err, false };
+Json Json::parse(const string &in, string &err, JsonParse strategy) {
+    JsonParser parser { in, 0, err, false, strategy };
     Json result = parser.parse_json(0);
 
     // Check for any trailing garbage
-    parser.consume_whitespace();
+    parser.consume_garbage();
     if (parser.i != in.size())
         return parser.fail("unexpected trailing " + esc(in[parser.i]));
 
@@ -670,14 +732,16 @@ Json Json::parse(const string &in, string &err) {
 }
 
 // Documented in json11.hpp
-vector<Json> Json::parse_multi(const string &in, string &err) {
-    JsonParser parser { in, 0, err, false };
+vector<Json> Json::parse_multi(const string &in,
+                               string &err,
+                               JsonParse strategy) {
+    JsonParser parser { in, 0, err, false, strategy };
 
     vector<Json> json_vec;
     while (parser.i != in.size() && !parser.failed) {
         json_vec.push_back(parser.parse_json(0));
         // Check for another object
-        parser.consume_whitespace();
+        parser.consume_garbage();
     }
     return json_vec;
 }
