@@ -226,12 +226,12 @@ struct Statics {
     Statics() {}
 };
 
-const Statics & statics() {
+static const Statics & statics() {
     static const Statics s {};
     return s;
 }
 
-const Json & static_null() {
+static const Json & static_null() {
     // This has to be separate, not in Statics, because Json() accesses statics().null.
     static const Json json_null;
     return json_null;
