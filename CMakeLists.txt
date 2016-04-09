@@ -1,21 +1,14 @@
-project(json11)
+project(json11 CXX)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2)
 
 enable_testing()
 
-add_definitions(
-    -std=c++11
-    -fno-rtti
-    -fno-exceptions
-    -Wall
-    -Wextra
-    -Werror)
+add_library(json11 json11.cpp)
+target_include_directories(json11 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_options(json11
+  PUBLIC -std=c++11
+  PRIVATE -fno-rtti -fno-exceptions -Wall -Wextra -Werror)
 
-set(json11_SRCS json11.cpp)
-
-add_library(json11 STATIC ${json11_SRCS})
-
-add_test(json11_test json11_test)
-
-add_executable(json11_test ${json11_SRCS} test.cpp)
+add_executable(json11_test test.cpp)
+target_link_libraries(json11_test json11)
