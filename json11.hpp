@@ -165,8 +165,17 @@ public:
     // Parse multiple objects, concatenated or separated by whitespace
     static std::vector<Json> parse_multi(
         const std::string & in,
+        std::string::size_type & parser_stop_pos,
         std::string & err,
         JsonParse strategy = JsonParse::STANDARD);
+
+    static inline std::vector<Json> parse_multi(
+        const std::string & in,
+        std::string & err,
+        JsonParse strategy = JsonParse::STANDARD) {
+        std::string::size_type parser_stop_pos;
+        return parse_multi(in, parser_stop_pos, err, strategy);
+    }
 
     bool operator== (const Json &rhs) const;
     bool operator<  (const Json &rhs) const;
