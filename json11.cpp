@@ -326,11 +326,12 @@ static inline bool in_range(long x, long lower, long upper) {
     return (x >= lower && x <= upper);
 }
 
+namespace {
 /* JsonParser
  *
  * Object that tracks all state of an in-progress parse.
  */
-struct JsonParser {
+struct JsonParser final {
 
     /* State
      */
@@ -718,6 +719,7 @@ struct JsonParser {
         return fail("expected value, got " + esc(ch));
     }
 };
+}//namespace {
 
 Json Json::parse(const string &in, string &err, JsonParse strategy) {
     JsonParser parser { in, 0, err, false, strategy };
