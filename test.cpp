@@ -1,13 +1,17 @@
+#ifdef NDEBUG
+#undef NDEBUG//at now assert will work even in Release build
+#endif
+#include <cassert>
 #include <string>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
 #include <sstream>
 #include "json11.hpp"
-#include <cassert>
 #include <list>
 #include <set>
 #include <unordered_map>
+#include <algorithm>
 
 using namespace json11;
 using std::string;
@@ -183,6 +187,36 @@ int main(int argc, char **argv) {
     assert(nested_array.array_items()[0].is_array());
     assert(nested_array.array_items()[0].array_items().size() == 3);
 
+    {
+        const std::string good_json = R"( {"k1" : "v1"})";
+        const std::string bad_json1 = good_json + " {";
+        const std::string bad_json2 = good_json + R"({"k2":"v2", "k3":[)";
+        struct TestMultiParse {
+            std::string input;
+            std::string::size_type expect_parser_stop_pos;
+            size_t expect_not_empty_elms_count;
+            Json expect_parse_res;
+        } tests[] = {
+            {" {", 0, 0, {}},
+            {good_json, good_json.size(), 1, Json(std::map<string, string>{ { "k1", "v1" } })},
+            {bad_json1, good_json.size() + 1, 1, Json(std::map<string, string>{ { "k1", "v1" } })},
+            {bad_json2, good_json.size(), 1, Json(std::map<string, string>{ { "k1", "v1" } })},
+            {"{}", 2, 1, Json::object{}},
+        };
+        for (const auto &tst : tests) {
+            std::string::size_type parser_stop_pos;
+            std::string err;
+            auto res = Json::parse_multi(tst.input, parser_stop_pos, err);
+            assert(parser_stop_pos == tst.expect_parser_stop_pos);
+            assert(
+                std::count_if(res.begin(), res.end(),
+                              [](const Json& j) { return !j.is_null(); })
+                == tst.expect_not_empty_elms_count);
+            if (!res.empty()) {
+                assert(tst.expect_parse_res == res[0]);
+            }
+        }
+    }
     Json my_json = Json::object {
         { "key1", "value1" },
         { "key2", false },
