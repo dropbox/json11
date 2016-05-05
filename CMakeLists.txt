@@ -15,4 +15,4 @@ target_link_libraries(json11_test json11)
 
 install(TARGETS json11 DESTINATION lib)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/json11.hpp" DESTINATION include)
-install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/json11.pc" DESTINATION lib/pkgconfig)
+install(FILES "${CMAKE_BINARY_DIR}/json11.pc" DESTINATION lib/pkgconfig)
