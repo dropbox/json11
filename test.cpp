@@ -180,13 +180,16 @@ int main(int argc, char **argv) {
     assert(uni[0].string_value().size() == (sizeof utf8) - 1);
     assert(std::memcmp(uni[0].string_value().data(), utf8, sizeof utf8) == 0);
 
-    // Demonstrates the behavior change in Xcode 7 / Clang 3.7 described
-    // here: https://llvm.org/bugs/show_bug.cgi?id=23812
-    Json nested_array = Json::array { Json::array { 1, 2, 3 } };
-    assert(nested_array.is_array());
-    assert(nested_array.array_items().size() == 1);
-    assert(nested_array.array_items()[0].is_array());
-    assert(nested_array.array_items()[0].array_items().size() == 3);
+    // Demonstrates the behavior change in Xcode 7 / Clang 3.7, introduced by DR1467
+    // and described here: https://llvm.org/bugs/show_bug.cgi?id=23812
+    const bool ENABLE_DR1467_CANARY = true; // Allow easy disabling for users who work around it.
+    if (ENABLE_DR1467_CANARY) {
+        Json nested_array = Json::array { Json::array { 1, 2, 3 } };
+        assert(nested_array.is_array());
+        assert(nested_array.array_items().size() == 1);
+        assert(nested_array.array_items()[0].is_array());
+        assert(nested_array.array_items()[0].array_items().size() == 3);
+    }
 
     {
         const std::string good_json = R"( {"k1" : "v1"})";
