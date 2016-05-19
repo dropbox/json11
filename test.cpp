@@ -87,6 +87,7 @@ int main(int argc, char **argv) {
     string failing_comment_test = R"({
       /* bad comment
       "a": 1,
+      // another comment to make C parsers which don't understand raw strings happy */
     })";
 
     string err_failing_comment;
@@ -209,8 +210,8 @@ int main(int argc, char **argv) {
             auto res = Json::parse_multi(tst.input, parser_stop_pos, err);
             assert(parser_stop_pos == tst.expect_parser_stop_pos);
             assert(
-                std::count_if(res.begin(), res.end(),
-                              [](const Json& j) { return !j.is_null(); })
+                (size_t)std::count_if(res.begin(), res.end(),
+                                      [](const Json& j) { return !j.is_null(); })
                 == tst.expect_not_empty_elms_count);
             if (!res.empty()) {
                 assert(tst.expect_parse_res == res[0]);
