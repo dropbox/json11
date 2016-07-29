@@ -5,7 +5,7 @@
  * code into this file as it builds, in order to make it into a test case for
  * your favorite framework.
  */
-#if(!JSON11_TEST_CUSTOM_CONFIG)
+#if !JSON11_TEST_CUSTOM_CONFIG
 #define JSON11_TEST_CPP_PREFIX_CODE
 #define JSON11_TEST_CPP_SUFFIX_CODE
 #define JSON11_TEST_STANDALONE_MAIN 1
@@ -251,7 +251,7 @@ JSON11_TEST_CASE(json11_test) {
     printf("%s\n", points_json.c_str());
 }
 
-#if(JSON11_TEST_STANDALONE_MAIN)
+#if JSON11_TEST_STANDALONE_MAIN
 
 static void parse_from_stdin() {
     string buf;
