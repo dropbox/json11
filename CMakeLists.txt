@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_library(json11 json11.cpp)
 target_include_directories(json11 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(json11
-  PRIVATE -fno-rtti -fno-exceptions -Wall -Wextra -Werror)
+  PRIVATE -fPIC -fno-rtti -fno-exceptions -Wall -Wextra -Werror)
 configure_file("json11.pc.in" "json11.pc" @ONLY)
 
 if (JSON11_BUILD_TESTS)
