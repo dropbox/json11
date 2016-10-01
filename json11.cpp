@@ -435,7 +435,7 @@ struct JsonParser final {
     char get_next_token() {
         consume_garbage();
         if (i == str.size())
-            return fail("unexpected end of input", 0);
+            return (char)fail("unexpected end of input", 0);
 
         return str[i++];
     }
