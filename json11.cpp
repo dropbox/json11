@@ -509,7 +509,7 @@ struct JsonParser final {
                 if (esc.length() < 4) {
                     return fail("bad \\u escape: " + esc, "");
                 }
-                for (int j = 0; j < 4; j++) {
+                for (size_t j = 0; j < 4; j++) {
                     if (!in_range(esc[j], 'a', 'f') && !in_range(esc[j], 'A', 'F')
                             && !in_range(esc[j], '0', '9'))
                         return fail("bad \\u escape: " + esc, "");
