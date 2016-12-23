@@ -18,11 +18,12 @@
 
 /*
  * Enable or disable code which demonstrates the behavior change in Xcode 7 / Clang 3.7,
- * introduced by DR1467 and described here: https://llvm.org/bugs/show_bug.cgi?id=23812
- * Defaults to on in order to act as a warning to anyone who's unaware of the issue.
+ * introduced by DR1467 and described here: https://github.com/dropbox/json11/issues/86
+ * Defaults to off since it doesn't appear the standards committee is likely to act
+ * on this, so it needs to be considered normal behavior.
  */
 #ifndef JSON11_ENABLE_DR1467_CANARY
-#define JSON11_ENABLE_DR1467_CANARY 1
+#define JSON11_ENABLE_DR1467_CANARY 0
 #endif
 
 /*
