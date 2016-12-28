@@ -4,7 +4,7 @@ project(json11 VERSION 1.0.0 LANGUAGES CXX)
 enable_testing()
 
 option(JSON11_BUILD_TESTS "Build unit tests" ON)
-option(JSON11_ENABLE_DR1467_CANARY "Enable canary test for DR 1467" ON)
+option(JSON11_ENABLE_DR1467_CANARY "Enable canary test for DR 1467" OFF)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
