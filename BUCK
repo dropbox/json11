@@ -1,5 +1,6 @@
 cxx_library(
   name = 'json11',
+  header_namespace = 'json11',
   headers = ['json11.hpp'],
   exported_headers = ['json11.hpp'],
   srcs = ['json11.cpp'],
