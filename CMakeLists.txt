@@ -15,7 +15,17 @@ endif()
 add_library(json11 json11.cpp)
 target_include_directories(json11 PUBLIC ${CMAKE_SOURCE_DIR})
 target_compile_options(json11
-  PRIVATE -fPIC -fno-rtti -fno-exceptions -Wall -Wextra -Werror)
+  PRIVATE -fPIC -fno-rtti -fno-exceptions -Wall)
+
+# Set warning flags, which may vary per platform
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  target_compile_options(json11
+    PRIVATE /W4 /WX)
+else()
+  target_compile_options(json11
+    PRIVATE -Wextra -Werror)
+endif()
+
 configure_file("json11.pc.in" "json11.pc" @ONLY)
 
 if (JSON11_BUILD_TESTS)
