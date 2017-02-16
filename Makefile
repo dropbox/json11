@@ -6,8 +6,12 @@ ifneq ($(JSON11_ENABLE_DR1467_CANARY),)
 CANARY_ARGS = -DJSON11_ENABLE_DR1467_CANARY=$(JSON11_ENABLE_DR1467_CANARY)
 endif
 
+ifneq ($(JSON11_BUILD_TESTS),)
+JSON11_BUILD_TESTS_ARGS = -DJSON11_BUILD_TESTS=$(JSON11_BUILD_TESTS)
+endif
+
 test: json11.cpp json11.hpp test.cpp
-	$(CXX) $(CANARY_ARGS) -O -std=c++11 json11.cpp test.cpp -o test -fno-rtti -fno-exceptions
+	$(CXX) $(CANARY_ARGS) $(JSON11_BUILD_TESTS_ARGS) -O -std=c++11 json11.cpp test.cpp -o test -fno-rtti -fno-exceptions
 
 clean:
 	if [ -e test ]; then rm test; fi
