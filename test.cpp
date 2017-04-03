@@ -64,7 +64,7 @@ JSON11_TEST_CASE(json11_test) {
         R"({"k1":"v1", "k2":42, "k3":["a",123,true,false,null]})";
 
     string err;
-    auto json = Json::parse(simple_test, err);
+    const auto json = Json::parse(simple_test, err);
 
     std::cout << "k1: " << json["k1"].string_value() << "\n";
     std::cout << "k3: " << json["k3"].dump() << "\n";
@@ -73,7 +73,7 @@ JSON11_TEST_CASE(json11_test) {
         std::cout << "    - " << k.dump() << "\n";
     }
 
-    const string comment_test = R"({
+    string comment_test = R"({
       // comment /* with nested comment */
       "a": 1,
       // comment
@@ -81,78 +81,69 @@ JSON11_TEST_CASE(json11_test) {
       "b": "text",
       /* multi
          line
-         comment */
+         comment
+        // line-comment-inside-multiline-comment
+      */
       // and single-line comment
+      // and single-line comment /* multiline inside single line */
       "c": [1, 2, 3]
+      // and single-line comment at end of object
     })";
 
     string err_comment;
     auto json_comment = Json::parse(
       comment_test, err_comment, JsonParse::COMMENTS);
-    if (!err_comment.empty()) {
-        printf("Failed: %s\n", err_comment.c_str());
-    } else {
-        printf("Result: %s\n", json_comment.dump().c_str());
-    }
+    JSON11_TEST_ASSERT(!json_comment.is_null());
+    JSON11_TEST_ASSERT(err_comment.empty());
 
-    string failing_comment_test = R"({
-      /* bad comment
-      "a": 1,
-      // another comment to make C parsers which don't understand raw strings happy */
-    })";
+    comment_test = "{\"a\": 1}//trailing line comment";
+    json_comment = Json::parse(
+      comment_test, err_comment, JsonParse::COMMENTS);
+    JSON11_TEST_ASSERT(!json_comment.is_null());
+    JSON11_TEST_ASSERT(err_comment.empty());
 
+    comment_test = "{\"a\": 1}/*trailing multi-line comment*/";
+    json_comment = Json::parse(
+      comment_test, err_comment, JsonParse::COMMENTS);
+    JSON11_TEST_ASSERT(!json_comment.is_null());
+    JSON11_TEST_ASSERT(err_comment.empty());
+
+    string failing_comment_test = "{\n/* unterminated comment\n\"a\": 1,\n}";
     string err_failing_comment;
     auto json_failing_comment = Json::parse(
       failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
-    if (!err_failing_comment.empty()) {
-        printf("Failed: %s\n", err_failing_comment.c_str());
-    } else {
-        printf("Result: %s\n", json_failing_comment.dump().c_str());
-    }
+    JSON11_TEST_ASSERT(json_failing_comment.is_null());
+    JSON11_TEST_ASSERT(!err_failing_comment.empty());
 
-    failing_comment_test = R"({
-      / / bad comment })";
-
+    failing_comment_test = "{\n/* unterminated trailing comment }";
     json_failing_comment = Json::parse(
       failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
-    if (!err_failing_comment.empty()) {
-        printf("Failed: %s\n", err_failing_comment.c_str());
-    } else {
-        printf("Result: %s\n", json_failing_comment.dump().c_str());
-    }
+    JSON11_TEST_ASSERT(json_failing_comment.is_null());
+    JSON11_TEST_ASSERT(!err_failing_comment.empty());
 
-    failing_comment_test = R"({// bad comment })";
-
+    failing_comment_test = "{\n/ / bad comment }";
     json_failing_comment = Json::parse(
       failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
-    if (!err_failing_comment.empty()) {
-        printf("Failed: %s\n", err_failing_comment.c_str());
-    } else {
-        printf("Result: %s\n", json_failing_comment.dump().c_str());
-    }
+    JSON11_TEST_ASSERT(json_failing_comment.is_null());
+    JSON11_TEST_ASSERT(!err_failing_comment.empty());
 
-    failing_comment_test = R"({
-          "a": 1
-        }/)";
-
+    failing_comment_test = "{// bad comment }";
     json_failing_comment = Json::parse(
       failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
-    if (!err_failing_comment.empty()) {
-        printf("Failed: %s\n", err_failing_comment.c_str());
-    } else {
-        printf("Result: %s\n", json_failing_comment.dump().c_str());
-    }
+    JSON11_TEST_ASSERT(json_failing_comment.is_null());
+    JSON11_TEST_ASSERT(!err_failing_comment.empty());
 
-    failing_comment_test = R"({/* bad
-                                  comment *})";
-
+    failing_comment_test = "{\n\"a\": 1\n}/";
     json_failing_comment = Json::parse(
       failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
-    if (!err_failing_comment.empty()) {
-        printf("Failed: %s\n", err_failing_comment.c_str());
-    } else {
-        printf("Result: %s\n", json_failing_comment.dump().c_str());
-    }
+    JSON11_TEST_ASSERT(json_failing_comment.is_null());
+    JSON11_TEST_ASSERT(!err_failing_comment.empty());
+
+    failing_comment_test = "{/* bad\ncomment *}";
+    json_failing_comment = Json::parse(
+      failing_comment_test, err_failing_comment, JsonParse::COMMENTS);
+    JSON11_TEST_ASSERT(json_failing_comment.is_null());
+    JSON11_TEST_ASSERT(!err_failing_comment.empty());
 
     std::list<int> l1 { 1, 2, 3 };
     std::vector<int> l2 { 1, 2, 3 };
@@ -165,13 +156,14 @@ JSON11_TEST_CASE(json11_test) {
     JSON11_TEST_ASSERT(Json(m1) == Json(m2));
 
     // Json literals
-    Json obj = Json::object({
+    const Json obj = Json::object({
         { "k1", "v1" },
         { "k2", 42.0 },
         { "k3", Json::array({ "a", 123.0, true, false, nullptr }) },
     });
 
     std::cout << "obj: " << obj.dump() << "\n";
+    JSON11_TEST_ASSERT(obj.dump() == "{\"k1\": \"v1\", \"k2\": 42, \"k3\": [\"a\", 123, true, false, null]}");
 
     JSON11_TEST_ASSERT(Json("a").number_value() == 0);
     JSON11_TEST_ASSERT(Json("a").string_value() == "a");
@@ -231,13 +223,15 @@ JSON11_TEST_CASE(json11_test) {
             }
         }
     }
+
     Json my_json = Json::object {
         { "key1", "value1" },
         { "key2", false },
         { "key3", Json::array { 1, 2, 3 } },
     };
-    std::string json_str = my_json.dump();
-    printf("%s\n", json_str.c_str());
+    std::string json_obj_str = my_json.dump();
+    std::cout << "json_obj_str: " << json_obj_str << "\n";
+    JSON11_TEST_ASSERT(json_obj_str == "{\"key1\": \"value1\", \"key2\": false, \"key3\": [1, 2, 3]}");
 
     class Point {
     public:
@@ -249,7 +243,8 @@ JSON11_TEST_CASE(json11_test) {
 
     std::vector<Point> points = { { 1, 2 }, { 10, 20 }, { 100, 200 } };
     std::string points_json = Json(points).dump();
-    printf("%s\n", points_json.c_str());
+    std::cout << "points_json: " << points_json << "\n";
+    JSON11_TEST_ASSERT(points_json == "[[1, 2], [10, 20], [100, 200]]");
 }
 
 #if JSON11_TEST_STANDALONE_MAIN
