@@ -300,6 +300,8 @@ const Json & JsonArray::operator[] (size_t i) const {
  */
 
 bool Json::operator== (const Json &other) const {
+    if (m_ptr == other.m_ptr)
+        return true;
     if (m_ptr->type() != other.m_ptr->type())
         return false;
 
@@ -307,6 +309,8 @@ bool Json::operator== (const Json &other) const {
 }
 
 bool Json::operator< (const Json &other) const {
+    if (m_ptr == other.m_ptr)
+        return false;
     if (m_ptr->type() != other.m_ptr->type())
         return m_ptr->type() < other.m_ptr->type();
 
