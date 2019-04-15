@@ -30,8 +30,9 @@ target_compile_options(json11
 # Set warning flags, which may vary per platform
 include(CheckCXXCompilerFlag)
 set(_possible_warnings_flags /W4 /WX -Wextra -Werror)
-foreach(_warning_flag in ${_possible_warnings_flags})
-  CHECK_CXX_COMPILER_FLAG(_warning_flag _flag_supported)
+foreach(_warning_flag ${_possible_warnings_flags})
+  unset(_flag_supported)
+  CHECK_CXX_COMPILER_FLAG(${_warning_flag} _flag_supported)
   if(${_flag_supported})
     target_compile_options(json11 PRIVATE ${_warning_flag})
   endif()
