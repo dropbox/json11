@@ -43,5 +43,3 @@ For more documentation see json11.hpp.
 
 __Maintenance note:__ This repo is stable but no longer actively maintained.  No further development
 is planned, and no new feature PRs will be merged.  Bug fixes may be merged on a volunteer basis.
-If you have questions or want to talk to other users of Djinni, you can join the Slack community
-via the link at the end of this document.
