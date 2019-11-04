@@ -245,6 +245,11 @@ JSON11_TEST_CASE(json11_test) {
     std::string points_json = Json(points).dump();
     std::cout << "points_json: " << points_json << "\n";
     JSON11_TEST_ASSERT(points_json == "[[1, 2], [10, 20], [100, 200]]");
+
+    JSON11_TEST_ASSERT(((Json)(Json::object { { "foo", nullptr } })).has_shape({ { "foo", Json::NUL } }, err) == true);
+    JSON11_TEST_ASSERT(((Json)(Json::object { { "foo", 1234567 } })).has_shape({ { "foo", Json::NUL } }, err) == false);
+    JSON11_TEST_ASSERT(((Json)(Json::object { { "bar", 1234567 } })).has_shape({ { "foo", Json::NUL } }, err) == false);
+
 }
 
 #if JSON11_TEST_STANDALONE_MAIN
