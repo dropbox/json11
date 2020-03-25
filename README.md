@@ -40,6 +40,3 @@ JSON values can have their values queried and inspected:
     std::string str = json[0]["k"].string_value();
 
 For more documentation see json11.hpp.
-
-__Maintenance note:__ This repo is stable but no longer actively maintained.  No further development
-is planned, and no new feature PRs will be merged.  Bug fixes may be merged on a volunteer basis.
